@@ -291,7 +291,6 @@ export default new Vuex.Store({
         lat: 41.16683,
         rate: 0,
         img: "https://www.winetourismportugal.com/fotos/produtos/quinta_do_seixo3_114540268254f7395d945b4_1.jpeg"
-      
       },
       {
         id: 24,
@@ -304,7 +303,6 @@ export default new Vuex.Store({
         lat: 41.15679,
         rate: 0,
         img: "https://apis.infoportugal.info/cms-media/pois/final/133/ARM.HO.77-133970.jpg"
-
       },
       {
         id: 25,
@@ -355,22 +353,16 @@ export default new Vuex.Store({
         img: "http://1.bp.blogspot.com/-nyaLIqLSo5w/UjN96jNlUCI/AAAAAAAAHKo/JZArDjRCRmM/s400/P1280912.JPG"
       }
     ],
-
-    myRoutes:[{
-        id : 1,
-        route : 1,
-        lunch : true,
-        wine : true
-    }
-
-    ],
-
     routeSelected: "",
-    winerieSelected: "",
-    myRoutesSelected: "",
-    existWineries:false,  
-    comments: []
-
+    winerieSelected: "0",
+    existWineries: false,
+    comments: [],
+    ratings: [],
+    count: 0,
+    average: 0,
+    vote: true,
+    routesUsers: [],
+    selectMyRouteId: 0
   },
   getters: {
     name(state) {
@@ -383,17 +375,39 @@ export default new Vuex.Store({
       return state.loggedUser[0].type;
     },
     routeSelect(state) {
-      return state.routeSelected
+      return state.routeSelected;
     },
     winerieSelect(state) {
-      return state.winerieSelected
+      return state.winerieSelected;
     },
     lastIdComment(state) {
-      return state.comments.length ? state.comments[state.comments.length - 1].id : 0
+      return state.comments.length ?
+        state.comments[state.comments.length - 1].id :
+        0;
+    },
+    selectedMyRouteId(state) {
+      return state.selectMyRouteId;
+    },
+    winerieName(state) {
+      for (const winerie of state.wineries) {
+        if (winerie.id == state.winerieSelected) {
+          return winerie.name;
+        }
+      }
     },
     lastId(state) {
-      return state.wineries.length ? state.wineries[state.wineries.length - 1].id : 0
-    }
+      return state.wineries.length ?
+        state.wineries[state.wineries.length - 1].id :
+        0;
+    },
+    lastIdRating(state) {
+      return state.ratings.length ? state.ratings[state.ratings.length - 1].id : 0
+    },
+    lastIdMyRoutes(state) {
+      return state.routesUsers.length ?
+        state.routesUsers[state.routesUsers.length - 1].id :
+        0;
+    },
   },
   mutations: {
     ADD_USER(state, payload) {
@@ -484,10 +498,8 @@ export default new Vuex.Store({
         if (user.email === payload.mail) {
           if (user.type == 0) {
             user.type = 1;
-            alert("aqui");
           } else {
             user.type = 0;
-            alert("aqui1");
           }
         }
       }
@@ -496,6 +508,12 @@ export default new Vuex.Store({
     REMOVE_USER(state, payload) {
       state.users = state.users.filter(user => user.email !== payload.email);
       localStorage.setItem("users", JSON.stringify(this.state.users));
+    },
+    REMOVE_COMMENT(state, payload) {
+      state.comments = state.comments.filter(
+        comment => comment.id !== payload.id
+      );
+      localStorage.setItem("comments", JSON.stringify(this.state.comments));
     },
     ORDER_BY_NAME(state, payload) {
       state.users.sort(payload.compare);
@@ -515,7 +533,7 @@ export default new Vuex.Store({
           winerie.lat === payload.latitudeForm &&
           winerie.long === payload.longForm
         ) {
-          alert("aqui")
+          alert("aqui");
           state.existWineries = true;
         }
       }
@@ -530,31 +548,24 @@ export default new Vuex.Store({
           long: payload.longForm,
           lat: payload.latitudeForm,
           rate: 0,
-          img: payload.imgForm,
+          img: payload.imgForm
         });
         localStorage.setItem("wineries", JSON.stringify(this.state.wineries));
-
       } else {
         alert("Já existe quinta/adega com as mesmas cordenadas");
-        state.existWineries = false
+        state.existWineries = false;
       }
     },
-    ADD_MYROUTES(state, payload){
-      state.myRoutes.push({
-        id: payload.idRoute,
-        route : payload.routesMy,
-        lunch : payload.lunchMy,
-        wine : payload.wineMy
-      });
-      alert("rota adicionada")
-      localStorage.setItem("myRoutes", JSON.stringify(this.state.myRoutes))
-    },
     SELECT_ROUTE(state, payload) {
-      state.routeSelected = payload.idRoute
-
+      state.routeSelected = payload.idRoute;
+      sessionStorage.setItem(
+        "routeSelected",
+        JSON.stringify(this.state.routeSelect)
+      );
     },
     SELECT_WINERIE(state, payload) {
-      state.winerieSelected = payload.idWinerie
+      state.winerieSelected = payload.idWinerie;
+      sessionStorage.setItem("winerieSelected", JSON.stringify(this.state.winerieSelected))
     },
     ADD_COMMENT(state, payload) {
       state.comments.push({
@@ -564,9 +575,38 @@ export default new Vuex.Store({
         name: payload.nameComment,
         comment: payload.textComment,
         date: payload.dateComment,
-        hour: payload.hourComment
-      })
+        hour: payload.hourComment,
+        nameWinerie: payload.nameWineries
+      });
       localStorage.setItem("comments", JSON.stringify(this.state.comments));
+    },
+    RATING(state, payload) {
+      state.ratings.push({
+        id: payload.idRate,
+        idWinerie: payload.id,
+        rate: payload.rating,
+        userRate: payload.user
+      })
+      localStorage.setItem("ratings", JSON.stringify(this.state.ratings));
+    },
+    REMOVE_RATING(state, payload) {
+      state.ratings = state.ratings.filter(
+        rating => rating.id !== payload.idRate
+      );
+      localStorage.setItem("ratings", JSON.stringify(this.state.ratings));
+    },
+    ROUTES_USERS(state, payload) {
+      state.routesUsers.push({
+        id: payload.routeUser,
+        routeId: payload.idRoute,
+        user: payload.username,
+        wineries: payload.chkWineries
+      })
+      localStorage.setItem("routesUsers", JSON.stringify(this.state.routesUsers));
+    },
+    ////////////////////////////CHANGES
+    CHANGE_SELECTED_MYROUTES(state,payload){
+      state.selectMyRouteId= payload.selectRoute
     }
   },
   actions: {},

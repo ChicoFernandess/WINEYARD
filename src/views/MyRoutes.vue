@@ -5,140 +5,186 @@
     <br />
     <div style="text-align:center">
       <h3>As minhas rotas</h3>
-      <br/>
+      <br />
+     <!--  <div v-for="userR in filterRoutesUser" :key="userR">
+          <p>{{userR.wineries}}</p>
+      </div> -->
 
       <form v-on:submit.prevent="addMyRoutes()">
-        <div class="form-group container col-sm-4">
+        <div class="form-group container col-sm-6">
           <label for="selectRoutes">Escolher Rota</label>
           <select class="form-control" id="selectRoutes" v-model="routesMy">
             <option value="1">Rota 1</option>
             <option value="2">Rota 2</option>
             <option value="3">Rota 3</option>
           </select>
-          
-<br>
-
-
-          <br />
-          <label for>Almoço</label>
-          <br />
-          <br />
-          <div class="form-group container col-sm-3">
-            <div class="switch_box box_4">
-              <div class="input_wrapper">
-                <input value="" id="checkLunch" type="checkbox" class="switch_4" v-model="lunchMy" />
-                <svg
-                  class="is_checked"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 426.67 426.67"
-                >
-                  <path
-                    d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z"
-                  />
-                </svg>
-                <svg
-                  class="is_unchecked"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 212.982 212.982"
-                >
-                  <path
-                    d="M131.804 106.49l75.936-75.935c6.99-6.99 6.99-18.323 0-25.312-6.99-6.99-18.322-6.99-25.312 0L106.49 81.18 30.555 5.242c-6.99-6.99-18.322-6.99-25.312 0-6.99 6.99-6.99 18.323 0 25.312L81.18 106.49 5.24 182.427c-6.99 6.99-6.99 18.323 0 25.312 6.99 6.99 18.322 6.99 25.312 0L106.49 131.8l75.938 75.937c6.99 6.99 18.322 6.99 25.312 0 6.99-6.99 6.99-18.323 0-25.313l-75.936-75.936z"
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
-                  />
-                </svg>
-              </div>
-            </div>
+          <div class="col-sm-6">
+            <table v-if="this.routesMy != '' " class="table form-group" style="text-align:middle">
+              <thead>
+                <tr>
+                  <th class="align-middle" scope="col">Nome</th>
+                  <th class="align-middle" scope="col">Classificação</th>
+                  <th class="align-middle" scope="col">Degustação</th>
+                  <th class="align-middle" scope="col">Almoço</th>
+                  <th class="align-middle" scope="col">Visitar</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="winerie in filterRoutes" v-bind:key="winerie">
+                  <td class="align-middle">{{ winerie.name }}</td>
+                  <td class="align-middle">{{ winerie.rate }}</td>
+                  <td class="align-middle">
+                    <span v-if="winerie.wine == true">SIM</span>
+                    <span v-else>NÃO</span>
+                  </td>
+                  <td class="align-middle">
+                    <span v-if="winerie.lunch == true">SIM</span>
+                    <span v-else>NÃO</span>
+                  </td>
+                  <td class="align-middle">
+                    <input type="checkbox" :value="winerie.id" v-model="checkWineries" />
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
 
           <br />
-          <label for>Degustação de vinhos</label>
-          <br />
-          <br />
-          <div class="form-group container col-sm-3">
-            <div class="switch_box box_4">
-              <div class="input_wrapper">
-                <input value="" id="checkWine" type="checkbox" class="switch_4" v-model="wineMy"/>
-                <svg
-                  class="is_checked"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 426.67 426.67"
-                >
-                  <path
-                    d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z"
-                  />
-                </svg>
-                <svg
-                  class="is_unchecked"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 212.982 212.982"
-                >
-                  <path
-                    d="M131.804 106.49l75.936-75.935c6.99-6.99 6.99-18.323 0-25.312-6.99-6.99-18.322-6.99-25.312 0L106.49 81.18 30.555 5.242c-6.99-6.99-18.322-6.99-25.312 0-6.99 6.99-6.99 18.323 0 25.312L81.18 106.49 5.24 182.427c-6.99 6.99-6.99 18.323 0 25.312 6.99 6.99 18.322 6.99 25.312 0L106.49 131.8l75.938 75.937c6.99 6.99 18.322 6.99 25.312 0 6.99-6.99 6.99-18.323 0-25.313l-75.936-75.936z"
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
-                  />
-                </svg>
+          <div class="row">
+            <div class="col-sm-6">
+              <label for>Almoço</label>
+              <br />
+              <br />
+
+              <div class="switch_box box_4">
+                <div class="input_wrapper">
+                  <input id="checkLunch" type="checkbox" class="switch_4" v-model="lunchMy" />
+                  <svg
+                    class="is_checked"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 426.67 426.67"
+                  >
+                    <path
+                      d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z"
+                    />
+                  </svg>
+                  <svg
+                    class="is_unchecked"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 212.982 212.982"
+                  >
+                    <path
+                      d="M131.804 106.49l75.936-75.935c6.99-6.99 6.99-18.323 0-25.312-6.99-6.99-18.322-6.99-25.312 0L106.49 81.18 30.555 5.242c-6.99-6.99-18.322-6.99-25.312 0-6.99 6.99-6.99 18.323 0 25.312L81.18 106.49 5.24 182.427c-6.99 6.99-6.99 18.323 0 25.312 6.99 6.99 18.322 6.99 25.312 0L106.49 131.8l75.938 75.937c6.99 6.99 18.322 6.99 25.312 0 6.99-6.99 6.99-18.323 0-25.313l-75.936-75.936z"
+                      fill-rule="evenodd"
+                      clip-rule="evenodd"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <br />
+            <div class="col-sm-6 text-align:right">
+              <label for>Degustação de vinhos</label>
+              <br />
+              <br />
+
+              <div class="switch_box box_4" style="text-align:center">
+                <div class="input_wrapper">
+                  <input id="checkWine" type="checkbox" class="switch_4" v-model="wineMy" />
+                  <svg
+                    class="is_checked"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 426.67 426.67"
+                  >
+                    <path
+                      d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z"
+                    />
+                  </svg>
+                  <svg
+                    class="is_unchecked"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 212.982 212.982"
+                  >
+                    <path
+                      d="M131.804 106.49l75.936-75.935c6.99-6.99 6.99-18.323 0-25.312-6.99-6.99-18.322-6.99-25.312 0L106.49 81.18 30.555 5.242c-6.99-6.99-18.322-6.99-25.312 0-6.99 6.99-6.99 18.323 0 25.312L81.18 106.49 5.24 182.427c-6.99 6.99-6.99 18.323 0 25.312 6.99 6.99 18.322 6.99 25.312 0L106.49 131.8l75.938 75.937c6.99 6.99 18.322 6.99 25.312 0 6.99-6.99 6.99-18.323 0-25.313l-75.936-75.936z"
+                      fill-rule="evenodd"
+                      clip-rule="evenodd"
+                    />
+                  </svg>
+                </div>
               </div>
             </div>
           </div>
         </div>
-        <br>
-        <br>
-        <br>
-        <button type="submit" class="button">+ Adicionar rota</button>
       </form>
 
       <br />
       <br />
 
+      <button type="submit" @click="addMyRoutes" class="button">+ Adicionar rota</button>
       
-      <br>
-      <br>
-      <br>
-    
+      <div class="google-map" id="myMap"></div>
+      <br />
+      <br />
+      <br />
     </div>
   </div>
 </template>
 
-
 <script>
-
- export default {
+export default {
   data: () => ({
     routesMy: "",
     lunchMy: "",
-    wineMy: ""
+    wineMy: "",
+    checkWineries: []
   }),
-  methods : {
+  created: function() {
+    if (localStorage.getItem("routesUsers")) {
+      this.$store.state.routesUsers = JSON.parse(
+        localStorage.getItem("routesUsers")
+      );
+    }
+  },
+  methods: {
     getLastId() {
-      return this.$store.getters.lastId;
+      return this.$store.getters.lastIdMyRoutes;
+    },
+    addMyRoutes() {
+      let lastId = this.getLastId()
+      this.$store.commit("ROUTES_USERS", {
+        routeUser: lastId + 1,
+        idRoute: this.routesMy,
+        username: this.$store.getters.email,
+        chkWineries: this.checkWineries
+      });
+      let c = confirm("Deseja iniciar a sua rota?")
+      if(c == true){
+      this.$router.push({name: 'route' ,params:lastId + 1})
+      this.$store.state.selectMyRouteId = lastId + 1 
+      }
+    },
 
   },
-  addMyRoutes() {
-    this.$store.commit("ADD_MYROUTES", {
-       idMyRoutes: this.getLastId() + 1,
-       routesMy: this.routesMy,
-       lunchMy: this.lunchMy,
-       wineMy: this.wineMy
-
-
-    });
+  computed: {
+    filterRoutes() {
+      return this.$store.state.wineries.filter(
+        winerie => winerie.route == this.routesMy
+      );
+    },
+    filterRoutesUser(){
+      return this.$store.state.routesUsers.filter(
+        routeUser => routeUser.user == this.$store.getters.email  
+      )
+    }
   }
-}
 };
-
 </script>
 
-
-
-
-
-
 <style>
-   
 .button {
-  background-color: #383131; 
+  background-color: #555555; /* Green */
   border: none;
   color: white;
   padding: 15px 32px;
@@ -150,7 +196,9 @@
   cursor: pointer;
   font-family: "Cinzel", serif;
 }
-
+.button:hover {
+  background-color: #689666;
+}
 label {
   font-family: "Didact Gothic", sans-serif;
 }
@@ -280,6 +328,8 @@ h3 {
   -webkit-transform: translateX(-190%) translateY(-30%) scale(0);
   transform: translateX(-190%) translateY(-30%) scale(0);
 }
+.google-map {
+  height: 500px;
+  margin: auto;
+}
 </style>
-
-

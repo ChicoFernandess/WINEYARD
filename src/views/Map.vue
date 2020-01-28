@@ -3,45 +3,64 @@
     <br />
     <br />
     <br />
-    <h1>Titulo</h1>
-    <p>Descrição</p>
+    <div v-for="winerie in this.$store.state.wineries" :key="winerie">
+      <span v-if="winerie.id == getwinerieSelected()">
+        <h1>{{winerie.name}}</h1>
+        <h5>{{winerie.description}}</h5>
+        <img v-bind:src="winerie.img" alt />
+      </span>
+    </div>
     <hr />
-    <div class="container col-sm-12">
-      <h2>Comentários</h2>
-      <form v-on:submit.prevent="addComment()" v-if="this.$store.state.loggedUser.length != 0">
-        <div class="form-group">
-          <textarea
-            class="form-group"
-            style="resize: none"
-            id="comment"
-            rows="2"
-            v-model="textComment"
-          ></textarea>
-        </div>
-        <button type="submit">Comentar</button>
-        <br>
-        <br>
-        
-      </form>
-
-      <div class="slidecontainer">
-          <b id="change">1</b><input type="range" min="1" max="5" value="0" class="slider" id="myRange" v-model="rating" />5
-          <p >
-            Value:{{rating}}
-            <span id="demo"></span> <br>
-            <button id="btnPoints">Pontuar</button>
-          </p>
-        </div>
-      <div v-for="comment in this.$store.state.comments.slice().reverse()" v-bind:key="comment">
-        <!-- <span v-if='idWinerie == this.$store.state.winerieSelected'></span> -->
-        <hr />
-        <h5>{{comment.name}}</h5>
-        <div class="row">
-          <p class="col-sm-10">{{comment.comment}}</p>
-          <button>APAGAR</button>
-        </div>
-        <small>{{comment.date}} {{comment.hour}}</small>
+    <div class="container col-sm-12" v-if="this.$store.state.loggedUser.length != 0">
+      <div v-if="this.filterRatings.length == 0">
+        <b>1</b> &nbsp;
+        <input
+          type="range"
+          min="1"
+          max="5"
+          value="3"
+          class="slider"
+          id="myRange"
+          v-model="rating"
+        /> &nbsp;
+        <b>5</b>
+        <button @click="vote()">Pontuar</button>
+        <p>Value:{{ rating }}</p>
       </div>
+      <div v-for="rate in filterRatings" :key="rate">
+        <span>
+          Seu voto:{{rate.rate}}
+          <button @click="changeRating(rate.id)">Alterar</button>
+        </span>
+      </div>
+    </div>
+    <h3>Comentários</h3>
+    <form v-on:submit.prevent="addComment()" v-if="this.$store.state.loggedUser.length != 0">
+      <div class="form-group">
+        <span></span>
+        <textarea
+          class="form-group"
+          style="resize: none; height: 100px; width: 500px"
+          id="comment"
+          rows="2"
+          v-model="textComment"
+        ></textarea>
+        <div class="slidecontainer"></div>
+      </div>
+      <button type="submit">Comentar</button>
+      <br />
+      <br />
+    </form>
+    <div v-for="comment in this.$store.state.comments.slice().reverse()" v-bind:key="comment">
+      <span v-if="comment.idWinerie == getwinerieSelected()">
+        <hr />
+        <h5>{{ comment.name }}</h5>
+        <div class="row">
+          <p class="col-sm-10">{{ comment.comment }}</p>
+          <!--  <button v-if="this.$store.state.loggedUser.length != 0 && getTypeUser()!= 1 " id="lixo">🗑️</button> -->
+        </div>
+        <small>{{ comment.date }} {{ comment.hour }}</small>
+      </span>
     </div>
   </div>
 </template>
@@ -50,22 +69,43 @@ export default {
   data: () => ({
     textComment: "",
     typeUser: "",
-    rating:"",
+    rating: "",
+    total:0,
   }),
   created: function() {
+    alert(this.$router.params.winerieIdwinerieId)
     window.addEventListener("unload", this.saveStorage);
     if (localStorage.getItem("comments")) {
       this.$store.state.comments = JSON.parse(localStorage.getItem("comments"));
     }
-  },
-  computed: {
-    getTypeUser() {
-      return this.$store.getters.typeUser;
+    if (localStorage.getItem("wineries")) {
+      this.$store.state.wineries = JSON.parse(localStorage.getItem("wineries"));
     }
+    if (sessionStorage.getItem("winerieSelected")) {
+      this.$store.state.winerieSelected = JSON.parse(
+        sessionStorage.getItem("winerieSelected")
+      );
+    }
+    if (localStorage.getItem("ratings")) {
+      this.$store.state.ratings = JSON.parse(localStorage.getItem("ratings"));
+    }
+    /* window.addEventListener("onload", this.average()); */
   },
   methods: {
+    getTypeUser() {
+      return this.$store.getters.typeUser;
+    },
     getLastId() {
       return this.$store.getters.lastIdComment;
+    },
+    getwinerieSelected() {
+      return this.$store.getters.winerieSelect;
+    },
+    getLastIdRating() {
+      return this.$store.getters.lastIdRating;
+    },
+    getEmail() {
+      return this.$store.getters.email;
     },
     addComment() {
       let today = new Date();
@@ -77,7 +117,7 @@ export default {
       alert();
       this.$store.commit("ADD_COMMENT", {
         idComment: this.getLastId() + 1,
-        idWinerieComment: 1,
+        idWinerieComment: this.getwinerieSelected(),
         emailComment: this.$store.getters.email,
         nameComment: this.$store.getters.name,
         textComment: this.textComment,
@@ -85,6 +125,42 @@ export default {
         hourComment: `${hour}:${minutes}`
       });
       this.textComment = "";
+    },
+    vote() {
+      this.$store.commit("RATING", {
+        idRate: this.getLastIdRating() + 1,
+        id: this.$store.state.winerieSelected,
+        rating: this.rating,
+        user: this.$store.getters.email
+      });
+    },
+    changeRating(id) {
+      this.$store.commit("REMOVE_RATING", {
+        idRate: id
+      });
+    },
+/*     average() {
+      this.total = 0;
+      for (const rate of this.filterWineries()) {
+        this.total += rate.rate
+      }
+      let average = this.total/this.filterWineries().length
+    } */
+  },
+  computed: {
+    //Filtrar pelo o id da quinta aberta e pelo o user logado
+    filterRatings() {
+      return this.$store.state.ratings.filter(
+        rating =>
+          rating.idWinerie == this.$store.state.winerieSelected &&
+          rating.userRate == this.getEmail()
+      );
+    },
+    //Filtrar só o id da quinta nos ratings
+    filterWineries() {
+      return this.$store.state.ratings.filter(
+        rating => rating.idWinerie == this.$store.state.winerieSelected
+      );
     }
   }
 };
@@ -98,12 +174,12 @@ export default {
   -webkit-appearance: none;
   width: 20%;
   height: 10px;
-  border-radius: 8px;
-  background: #c051c0;
-  outline: 5px;
+  border-radius: 5px;
+  background: #444444;
+  outline: none;
   opacity: 0.7;
-  -webkit-transition: .2s;
-  transition: opacity .2s;
+  -webkit-transition: 0.2s;
+  transition: opacity 0.2s;
 }
 
 .slider:hover {
@@ -113,12 +189,10 @@ export default {
 .slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 23px;
-  height: 24px;
+  width: 25px;
+  height: 33px;
   border: 0;
-  background: url(
-    "../assets/circuloverde1.png"
-  );
+  background: url("../assets/logorating.png");
   cursor: pointer;
 }
 
@@ -126,9 +200,45 @@ export default {
   width: 20px;
   height: 21px;
   border: 0;
-  background: url('../assets/circuloverde1.png');
+  background: url("../assets/circuloverde1.png");
   cursor: pointer;
 }
 
+b {
+  font-family: "Cinzel", serif;
+}
 
+button {
+  background-color: #555555; /* Green */
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  font-family: "Cinzel", serif;
+}
+
+button:hover {
+  background-color: #689666;
+}
+
+h1 {
+  font-family: "Cinzel", serif;
+}
+
+h5,
+h3 {
+  font-family: "Didact Gothic", sans-serif;
+}
+#lixo {
+  background: none;
+}
+
+@import url("https://fonts.googleapis.com/css?family=Cinzel&display=swap");
+
+@import url("https://fonts.googleapis.com/css?family=Didact+Gothic&display=swap");
 </style>

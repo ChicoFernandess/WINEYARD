@@ -1,7 +1,6 @@
 <template>
   <div>
     <h1>MAPS WITH VUE</h1>
-    <button @click="renderMap()">RENDER MAP</button>
     <div class="google-map" id="myMap"></div>
   </div>
 </template>
@@ -9,40 +8,43 @@
 <script>
 export default {
   name: "Maps",
-  data: function() {
-    return {
-      map: "",
-      marker: "",
-      infoWindow: "",
-      contentString: "",
-      lat: "",
-      long: ""
-    };
-  },
   created: function() {
+    const obj = this
     if (localStorage.getItem("wineries")) {
       this.$store.state.wineries = JSON.parse(localStorage.getItem("wineries"));
     }
+    window.seleteWinerie = function(id) {
+        //alert("xxx" + id)
+        obj.$store.commit("SELECT_WINERIE", {idWinerie: id});
+        obj.$router.push({name: 'wineriesdescription', params:{winerieId: id}})
+    }
+    
   },
   computed: {
     getSelectedRoute() {
       return this.$store.getters.routeSelect;
     }
   },
+  async mounted() {
+    this.renderMap()
+  },
   methods: {
     renderMap() {
+      let lati = 0;
+      let long = 0;
+      let map = "";
       if (this.getSelectedRoute == 1) {
-        this.lat = 41.161933;
-        this.long = -7.766806;
+        lati = 41.161933;
+        long = -7.766806;
       } else if (this.getSelectedRoute == 2) {
-        this.lat = 41.163577;
-        this.long = -7.582799;
+        lati = 41.163577;
+        long = -7.582799;
       } else if (this.getSelectedRoute == 3) {
-        this.lat = 41.186872;
-        this.long = -7.115952;
+        lati = 41.186872;
+        long = -7.115952;
       }
-      this.map = new google.maps.Map(document.querySelector("#myMap"), {
-        center: { lat: this.lat, lng: this.long },
+      map = new google.maps.Map(document.querySelector("#myMap"), {
+        center: { lat: lati, lng: long },
         zoom: 13,
         streetViewControl: false,
         scaleControl: false,
@@ -370,30 +372,26 @@ export default {
     ]
   }
         ]
-     
       });
       for (const winerie of this.$store.state.wineries) {
         if (winerie.route == this.getSelectedRoute) {
-          this.marker = new google.maps.Marker({
-            position: { lat: winerie.lat, lng: winerie.long },
+          let marker = new google.maps.Marker({
+            position: { lat: Number(winerie.lat), lng: Number(winerie.long) },
             title: `${winerie.name}`,
-            animation: google.maps.Animation.BOUNCE,
-         icon: 'https://github.com/RuiFilipeSilva/WINEYARD/blob/master/src/assets/circulovermelho1.png?raw=true', // na net ver informacao de imagem e usar esse link 
-   
+            icon: 'https://github.com/ChicoFernandess/WINEYARD/blob/master/src/assets/logoMap.png?raw=true',
           });
-          this.contentString = `<div id="content"><div></div
-          <h1 class="firstHeading">${winerie.name}</h1>
+
+          let contentString = `<div id="content">
+          <h5>${winerie.name}</h5>
           <div><p>Latitude:${winerie.lat}</p>
           <p>Longitude:${winerie.long}</p>
-          <button id=${winerie.id} @click="seleteWinerie(${winerie.id})">Ver Mais</button>
+          <button onclick='seleteWinerie(${winerie.id})'">Ver Mais</button>
           </div></div>`;
-          this.infoWindow = new google.maps.InfoWindow({
-            content: this.contentString
+          let infoWindow = new google.maps.InfoWindow({
+            content: contentString
           });
-          this.marker.setMap(this.map);
-          this.marker.addListener("click", () =>
-            this.infowindow.open(this.map, this.marker)
-          );
+          marker.setMap(map);
+          marker.addListener("click", () => infoWindow.open(map, marker));
         }
       }
     },
@@ -401,6 +399,7 @@ export default {
       this.$store.commit("SELECT_WINERIE", {
         idWinerie: id
       });
+       this.$router.push({name: 'wineriesdescription', params:{winerieId: id}})
     }
   }
 };

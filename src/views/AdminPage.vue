@@ -76,8 +76,6 @@
         </div>
       </div>
     </div>
-    <br />
-    <br />
   </div>
 </template>
 
@@ -100,4 +98,16 @@
   margin: 4px 2px;
   cursor: pointer;
 }
+
+.button:hover {
+  background-color: #689666;
+}
+
+h1 {
+  font-family: "Cinzel", serif;
+}
+
+@import url("https://fonts.googleapis.com/css?family=Cinzel&display=swap");
+
+@import url("https://fonts.googleapis.com/css?family=Didact+Gothic&display=swap");
 </style>
