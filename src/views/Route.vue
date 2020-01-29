@@ -1,7 +1,7 @@
 <template>
   <div>
     <h1>ROTA ?</h1>
-    
+
     <div class="google-map" id="myMap"></div>
 
     <div id="result"></div>
@@ -21,8 +21,8 @@ export default {
     }
   },
   computed: {},
-  async mounted(){
-     this.renderMap()
+  async mounted() {
+    this.renderMap();
   },
   methods: {
     renderMap() {
@@ -377,26 +377,30 @@ export default {
     },
     calcRoute(directionsService, directionsRenderer) {
       let wayPts = [];
-      let start = []; 
-      
-      let end = []; 
+      let start = [];
+      let end = [];
       for (const winerie of this.$store.state.wineries) {
         for (const winerieRoute of this.$store.state.routesUsers) {
           if (winerieRoute.id == this.$store.state.selectMyRouteId) {
-            let len = winerieRoute.wineries.length-1
+            let len = winerieRoute.wineries.length - 1;
             if (winerie.id == winerieRoute.wineries[0]) {
-              start.push({ lat: Number(winerie.lat), lng: Number(winerie.long) });
+              start.push({
+                lat: Number(winerie.lat),
+                lng: Number(winerie.long)
+              });
             }
-            if(winerie.id == winerieRoute.wineries[len]){
-              end.push({ lat: Number(winerie.lat), lng: Number(winerie.long) })
+            if (winerie.id == winerieRoute.wineries[len]) {
+              end.push({ lat: Number(winerie.lat), lng: Number(winerie.long) });
             }
-            for (let i = 1; i < winerieRoute.wineries.length-1; i++) {
+            for (let i = 1; i < winerieRoute.wineries.length - 1; i++) {
               {
-                if(winerie.id == winerieRoute.wineries[i]){
-                let point = {lat: Number(winerie.lat), lng: Number(winerie.long)}
-                wayPts.push({location:point,stopover:true});
-                
-              }
+                if (winerie.id == winerieRoute.wineries[i]) {
+                  let point = {
+                    lat: Number(winerie.lat),
+                    lng: Number(winerie.long)
+                  };
+                  wayPts.push({ location: point, stopover: true });
+                }
               }
             }
           }
@@ -410,14 +414,13 @@ export default {
         origin: start[0],
         destination: end[0],
         waypoints: wayPts,
-        optimizeWaypoints: true, 
+        optimizeWaypoints: true,
         travelMode: google.maps.TravelMode[selectMode]
       };
-
-
       directionsService.route(request, (result, status) => {
         if (status == "OK") {
           directionsRenderer.setDirections(result);
+
           const directionsData = result.routes[0].legs[0];
 
           var route = result.routes[0];
@@ -441,15 +444,17 @@ export default {
             document.querySelector("#result").innerHTML =
               "Directions request faileds";
           }
-
-
-        } else {
+        }  else {
           document.querySelector("#result").innerHTML = status;
         }
-
-
       });
     }
   }
 };
 </script>
+<style scoped>
+.google-map {
+  height: 720px;
+  margin: 0 auto;
+}
+</style>

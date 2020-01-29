@@ -1,6 +1,7 @@
 <template>
   <div>
     <h1>MAPS WITH VUE</h1>
+
     <div class="google-map" id="myMap"></div>
   </div>
 </template>
@@ -9,24 +10,27 @@
 export default {
   name: "Maps",
   created: function() {
-    const obj = this
+    const obj = this;
     if (localStorage.getItem("wineries")) {
       this.$store.state.wineries = JSON.parse(localStorage.getItem("wineries"));
     }
     window.seleteWinerie = function(id) {
-        //alert("xxx" + id)
-        obj.$store.commit("SELECT_WINERIE", {idWinerie: id});
-        obj.$router.push({name: 'wineriesdescription', params:{winerieId: id}})
-    }
-    
+      alert("xxx" + id);
+      obj.$store.commit("SELECT_WINERIE", { idWinerie: id });
+      obj.$router.push({
+        name: "wineriesdescription",
+        params: { winerieId: id }
+      });
+    };
   },
   computed: {
     getSelectedRoute() {
       return this.$store.getters.routeSelect;
     }
   },
+
   async mounted() {
-    this.renderMap()
+    this.renderMap();
   },
   methods: {
     renderMap() {
@@ -378,7 +382,7 @@ export default {
           let marker = new google.maps.Marker({
             position: { lat: Number(winerie.lat), lng: Number(winerie.long) },
             title: `${winerie.name}`,
-            icon: 'https://github.com/ChicoFernandess/WINEYARD/blob/master/src/assets/logoMap.png?raw=true',
+             icon: 'https://github.com/ChicoFernandess/WINEYARD/blob/master/src/assets/logorating.png?raw=true',
           });
 
           let contentString = `<div id="content">
@@ -399,14 +403,17 @@ export default {
       this.$store.commit("SELECT_WINERIE", {
         idWinerie: id
       });
-       this.$router.push({name: 'wineriesdescription', params:{winerieId: id}})
+      this.$router.push({
+        name: "wineriesdescription",
+        params: { winerieId: id }
+      });
     }
   }
 };
 </script>
 <style scoped>
 .google-map {
-  height: 500px;
+  height: 720px;;
   margin: 0 auto;
 }
 </style>

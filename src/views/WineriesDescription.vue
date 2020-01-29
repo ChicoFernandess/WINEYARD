@@ -5,63 +5,91 @@
     <br />
     <div v-for="winerie in this.$store.state.wineries" :key="winerie">
       <span v-if="winerie.id == getwinerieSelected()">
-        <h1>{{winerie.name}}</h1>
-        <h5>{{winerie.description}}</h5>
-        <img v-bind:src="winerie.img" alt />
+        <h1 style="text-align:center">{{ winerie.name }}</h1>
+        <br /><br />
+        <div class="container">
+          <div class="row">
+            <div class="col-sm-6">
+              <h5>{{ winerie.description }}</h5>
+            </div>
+            <div class="col-sm-6">
+              <img v-bind:src="winerie.img" style="width:100%" />
+            </div>
+          </div>
+        </div>
       </span>
     </div>
     <hr />
-    <div class="container col-sm-12" v-if="this.$store.state.loggedUser.length != 0">
-      <div v-if="this.filterRatings.length == 0">
-        <b>1</b> &nbsp;
-        <input
-          type="range"
-          min="1"
-          max="5"
-          value="3"
-          class="slider"
-          id="myRange"
-          v-model="rating"
-        /> &nbsp;
-        <b>5</b>
-        <button @click="vote()">Pontuar</button>
-        <p>Value:{{ rating }}</p>
-      </div>
-      <div v-for="rate in filterRatings" :key="rate">
-        <span>
-          Seu voto:{{rate.rate}}
-          <button @click="changeRating(rate.id)">Alterar</button>
-        </span>
-      </div>
-    </div>
-    <h3>Comentários</h3>
-    <form v-on:submit.prevent="addComment()" v-if="this.$store.state.loggedUser.length != 0">
-      <div class="form-group">
-        <span></span>
-        <textarea
-          class="form-group"
-          style="resize: none; height: 100px; width: 500px"
-          id="comment"
-          rows="2"
-          v-model="textComment"
-        ></textarea>
-        <div class="slidecontainer"></div>
-      </div>
-      <button type="submit">Comentar</button>
-      <br />
-      <br />
-    </form>
-    <div v-for="comment in this.$store.state.comments.slice().reverse()" v-bind:key="comment">
-      <span v-if="comment.idWinerie == getwinerieSelected()">
-        <hr />
-        <h5>{{ comment.name }}</h5>
-        <div class="row">
-          <p class="col-sm-10">{{ comment.comment }}</p>
-          <!--  <button v-if="this.$store.state.loggedUser.length != 0 && getTypeUser()!= 1 " id="lixo">🗑️</button> -->
+
+    <div class="container">
+      <div class="row">
+        <div class="col-sm-6">
+          <h3>Comentários</h3>
+          <form
+            v-on:submit.prevent="addComment()"
+            v-if="this.$store.state.loggedUser.length != 0"
+          >
+            <div class="form-group">
+              <textarea
+                class="form-group"
+                style="resize: none; height: 100px; width: 500px"
+                id="comment"
+                rows="2"
+                v-model="textComment"
+              ></textarea>
+              <div class="slidecontainer"></div>
+            </div>
+            <button type="submit">Comentar</button>
+            <br />
+            <br />
+          </form>
+          <div
+            v-for="comment in this.$store.state.comments.slice().reverse()"
+            v-bind:key="comment"
+          >
+            <span v-if="comment.idWinerie == getwinerieSelected()">
+              <hr />
+              <h5>{{ comment.name }}</h5>
+              <div class="row">
+                <p class="col-sm-10">{{ comment.comment }}</p>
+                <!--  <button v-if="this.$store.state.loggedUser.length != 0 && getTypeUser()!= 1 " id="lixo">🗑️</button> -->
+              </div>
+              <small>{{ comment.date }} {{ comment.hour }}</small>
+            </span>
+          </div>
         </div>
-        <small>{{ comment.date }} {{ comment.hour }}</small>
-      </span>
+        <div class="col-sm-6" style="text-align:center">
+          <br />
+          <div v-if="this.$store.state.loggedUser.length != 0">
+            <div v-if="this.filterRatings.length == 0">
+              <b>1</b> &nbsp;
+              <input
+                type="range"
+                min="1"
+                max="5"
+                value="3"
+                class="slider"
+                id="myRange"
+                v-model="rating"
+              />
+              &nbsp;
+              <b>5</b>
+              <br />
+              <button @click="vote()">Pontuar</button>
+              <br /><br />
+              <h5>Valor:{{ rating }}</h5>
+            </div>
+            <div v-for="rate in filterRatings" :key="rate">
+              <span>
+                Seu voto:{{ rate.rate }}
+                <button @click="changeRating(rate.id)">Alterar</button>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+    <br /><br />
   </div>
 </template>
 <script>
@@ -70,10 +98,9 @@ export default {
     textComment: "",
     typeUser: "",
     rating: "",
-    total:0,
+    total: 0
   }),
   created: function() {
-    alert(this.$router.params.winerieIdwinerieId)
     window.addEventListener("unload", this.saveStorage);
     if (localStorage.getItem("comments")) {
       this.$store.state.comments = JSON.parse(localStorage.getItem("comments"));
@@ -107,6 +134,10 @@ export default {
     getEmail() {
       return this.$store.getters.email;
     },
+
+    winerieName() {
+      return this.$store.getters.winerieName;
+    },
     addComment() {
       let today = new Date();
       let day = today.getDate();
@@ -114,7 +145,6 @@ export default {
       let year = today.getFullYear();
       let hour = today.getHours();
       let minutes = today.getMinutes();
-      alert();
       this.$store.commit("ADD_COMMENT", {
         idComment: this.getLastId() + 1,
         idWinerieComment: this.getwinerieSelected(),
@@ -123,7 +153,7 @@ export default {
         textComment: this.textComment,
         dateComment: `${day}/${month}/${year}`,
         hourComment: `${hour}:${minutes}`,
-        nameWineries: this.getwinerieSelected()
+        nameWineries: this.winerieName()
       });
       this.textComment = "";
     },
@@ -139,8 +169,8 @@ export default {
       this.$store.commit("REMOVE_RATING", {
         idRate: id
       });
-    },
-/*     average() {
+    }
+    /*     average() {
       this.total = 0;
       for (const rate of this.filterWineries()) {
         this.total += rate.rate
