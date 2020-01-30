@@ -3,7 +3,8 @@
     <h1>ROTA ?</h1>
 
     <div class="google-map" id="myMap"></div>
-
+<br>
+  <h1><img src="../assets/circulovermelho1.png" /> <img src="../assets/circuloverde1.png" /> <img src="../assets/circuloroxo1.png" /> ETAPAS DA ROTA <img src="../assets/circulovermelho1.png" /> <img src="../assets/circuloverde1.png" /> <img src="../assets/circuloroxo1.png" /></h1> 
     <div id="result"></div>
   </div>
 </template>
@@ -46,7 +47,7 @@ export default {
       map = new google.maps.Map(document.querySelector("#myMap"), {
         center: { lat: lati, lng: long },
         zoom: 13,
-        streetViewControl: false,
+        streetViewControl: true,
         scaleControl: false,
         zoomControl: true,
         mapTypeControl: false,
@@ -457,4 +458,14 @@ export default {
   height: 720px;
   margin: 0 auto;
 }
+
+#result{
+  font-family: "Cinzel", serif;
+}
+
+h1 {
+    text-align: center;
+}
+
+@import url("https://fonts.googleapis.com/css?family=Cinzel&display=swap");
 </style>

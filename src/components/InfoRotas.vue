@@ -106,6 +106,8 @@
               <img src="../assets/circulovermelho1.png" /> À descoberta do Douro
               Superior
             </h4>
+            <button v-on:click="play" type="button">Audioguia</button>
+            <audio ref="audioElm" src="../assets/audio.mp3"></audio>
             <p class="card-text" style="text-align:center">
               Armamar, Galafura, Lamego, Mesão Frio, Peso da Régua - Poirares,
               Peso da Régua - Vilarinho de Freires, Pinhão, Sabrosa, Santa Marta
@@ -138,9 +140,11 @@ export default {
       this.$store.commit("SELECT_ROUTE", {
         idRoute: id
       });
-    }
+    },
+    play: function() {
+      this.$refs.audioElm.play();
   }
-};
+}};
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
